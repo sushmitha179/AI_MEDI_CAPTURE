@@ -1,45 +1,33 @@
 name: demo_project
 description: "A new Flutter project."
 
-publish_to: 'none'  # Prevents accidental publishing
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-
+  intl: ^0.18.1
   cupertino_icons: ^1.0.8
-  firebase_core: ^3.12.1  # Firebase Core
-  firebase_auth: ^5.5.1  # Firebase Authentication
-  cloud_firestore: ^5.6.6  # Firestore Database
-  camera: ^0.10.0+4  # Camera Access
-  image_picker: ^0.8.5+3  # Image Picker
-  
-  # Google ML Kit for text recognition & barcode scanning
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
+  cloud_firestore: ^5.6.6
+  camera: ^0.10.0+4
+  image_picker: ^0.8.5+3
+  path_provider: ^2.1.2  # ✅ Correct usage
   google_mlkit_barcode_scanning: 0.10.0  
   google_mlkit_text_recognition: ^0.11.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0  # Recommended Linting
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
-
-  # Uncomment to add assets
-  # assets:
-  #   - assets/images/sample.png
-
-  # Uncomment to add custom fonts
-  # fonts:
-  #   - family: CustomFont
-  #     fonts:
-  #       - asset: assets/fonts/CustomFont-Regular.ttf
-  #       - asset: assets/fonts/CustomFont-Bold.ttf
-  #         weight: 700
-
+  assets:
+    - assets/logo.png

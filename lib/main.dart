@@ -1,28 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Import generated Firebase options
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/home_screen.dart'; // Import HomeScreen
-import 'screens/scan_screen.dart'; // Import ScanScreen
-import 'screens/history_screen.dart'; // Import HistoryScreen
-import 'screens/notifications_screen.dart'; // Import NotificationsScreen
-import 'screens/settings_screen.dart'; // Import SettingsScreen
+import 'screens/home_screen.dart';
+import 'screens/scan_screen.dart';
+import 'screens/result_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp(
-      options:
-          DefaultFirebaseOptions
-              .currentPlatform, // Use Firebase options for all platforms
-    );
-    print("✅ Firebase initialized successfully");
-  } catch (e) {
-    print("❌ Firebase initialization failed: $e");
-  }
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MyApp());
 }
@@ -32,24 +23,49 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // Removes debug banner
-      title: 'AI Text Digitizer',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      initialRoute: '/', // Initial route set to LoginScreen
-      routes: {
-        '/': (context) => const LoginScreen(),
-        '/signup': (context) => const SignUpScreen(),
-        '/dashboard': (context) => DashboardScreen(),
-        '/home': (context) => HomeScreen(), // HomeScreen route
-        '/scan': (context) => ScanScreen(), // ScanScreen route
-        '/history': (context) => HistoryScreen(), // HistoryScreen route
-        '/notifications':
-            (context) => NotificationsScreen(), // NotificationsScreen route
-        '/settings': (context) => SettingsScreen(), // SettingsScreen route
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance
+          .authStateChanges(), // Listen to auth state changes
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasData) {
+          // User is logged in
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'AI Text Digitizer',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+            ),
+            initialRoute: '/home', // Go to home screen for logged-in users
+            routes: {
+              '/home': (context) => const HomeScreen(),
+              '/scan': (context) => const ScanScreen(),
+              '/results': (context) => const ResultScreen(),
+              '/settings': (context) => const SettingsScreen(),
+              '/notifications': (context) => const NotificationsScreen(),
+            },
+          );
+        } else {
+          // User is not logged in
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'AI Text Digitizer',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+            ),
+            initialRoute: '/splash', // Show splash screen first
+            routes: {
+              '/splash': (context) => const SplashScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignUpScreen(),
+            },
+          );
+        }
       },
     );
   }

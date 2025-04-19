@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
-        backgroundColor: Color(0xFF4e2a6e), // Your preferred color
+        title: const Text('Hi, there 👋'),
+        backgroundColor: const Color(0xFF4e2a6e),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -17,69 +19,70 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Section
-            Container(
-              padding: EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Color(0xFF4e2a6e).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.deepPurple,
-                    child: Icon(Icons.home, color: Colors.white),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'Welcome to Home Screen!',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-
-            // Quick Access Cards or Buttons
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  // Adjust crossAxisCount based on available width
-                  int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
-
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF4e2a6e), Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: Colors.deepPurple,
+                      child: Icon(Icons.home, color: Colors.white),
                     ),
-                    itemCount: 4,
-                    itemBuilder: (context, index) {
-                      return HomeCard(
-                        icon: _getIconForCard(index),
-                        label: _getLabelForCard(index),
-                        onTap: () {
-                          // Navigate to respective screen
-                          _navigateToScreen(index, context);
-                        },
-                      );
-                    },
-                  );
-                },
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Welcome to your Dashboard! ✨',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: 4,
+                      itemBuilder: (context, index) {
+                        return HomeCard(
+                          icon: _getIconForCard(index),
+                          label: _getLabelForCard(index),
+                          onTap: () => _navigateToScreen(index, context),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Helper method to return icon based on index
   IconData _getIconForCard(int index) {
     switch (index) {
       case 0:
@@ -95,30 +98,28 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  // Helper method to return label based on index
   String _getLabelForCard(int index) {
     switch (index) {
       case 0:
-        return 'Scan Now';
+        return 'Start New Scan';
       case 1:
-        return 'History';
+        return 'Scan History';
       case 2:
-        return 'Notifications';
+        return 'Alerts & Updates';
       case 3:
-        return 'Settings';
+        return 'App Settings';
       default:
         return 'Unknown';
     }
   }
 
-  // Navigate to different screens based on the card tapped
   void _navigateToScreen(int index, BuildContext context) {
     switch (index) {
       case 0:
         Navigator.pushNamed(context, '/scan');
         break;
       case 1:
-        Navigator.pushNamed(context, '/history');
+        Navigator.pushNamed(context, '/results');
         break;
       case 2:
         Navigator.pushNamed(context, '/notifications');
@@ -138,6 +139,7 @@ class HomeCard extends StatelessWidget {
   final Function() onTap;
 
   const HomeCard({
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
@@ -146,7 +148,7 @@ class HomeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1, // Ensures cards are square
+      aspectRatio: 1,
       child: Card(
         elevation: 6,
         shape: RoundedRectangleBorder(
@@ -154,16 +156,42 @@ class HomeCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onTap,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 50, color: Color(0xFF4e2a6e)),
-              SizedBox(height: 10),
-              Text(
-                label,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ],
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF4e2a6e).withOpacity(0.1),
+                  ),
+                  child: Icon(icon, size: 40, color: const Color(0xFF4e2a6e)),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4e2a6e),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

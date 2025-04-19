@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +64,7 @@ class DashboardCard extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  DashboardCard({required this.icon, required this.label});
+  const DashboardCard({super.key, required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {

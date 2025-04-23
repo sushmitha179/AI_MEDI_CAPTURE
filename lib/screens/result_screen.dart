@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // For timestamp formatting
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -45,9 +46,10 @@ class ResultScreen extends StatelessWidget {
               final data = docs[index].data() as Map<String, dynamic>;
               final text = data['text'] ?? 'No text';
               final timestamp = data['timestamp'] as Timestamp?;
-              final timeStr = timestamp != null
-                  ? timestamp.toDate().toLocal().toString()
-                  : 'No time';
+              final formattedTime = timestamp != null
+                  ? DateFormat('MMM d, yyyy – hh:mm a')
+                      .format(timestamp.toDate())
+                  : 'No time available';
 
               return ExpansionTile(
                 title: Text(
@@ -55,12 +57,23 @@ class ResultScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                subtitle: Text(timeStr),
+                subtitle: Text(formattedTime),
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(text),
                   ),
+                  // Uncomment the following to allow users to delete a scan
+                  // TextButton.icon(
+                  //   onPressed: () async {
+                  //     await docs[index].reference.delete();
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(content: Text('Scan deleted')),
+                  //     );
+                  //   },
+                  //   icon: Icon(Icons.delete, color: Colors.red),
+                  //   label: Text("Delete"),
+                  // ),
                 ],
               );
             },

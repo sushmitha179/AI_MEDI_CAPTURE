@@ -1,21 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hi, there 👋'),
         backgroundColor: const Color(0xFF4e2a6e),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Hi there 👋', style: TextStyle(fontSize: 18)),
+            if (user != null)
+              Text(
+                user.email ?? '',
+                style: const TextStyle(fontSize: 14, color: Colors.white70),
+              ),
+          ],
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
+          PopupMenuButton<String>(
+            onSelected: (String value) async {
+              if (value == 'logout') {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
+            icon: const CircleAvatar(
               backgroundColor: Colors.deepPurple,
               child: Icon(Icons.person, color: Colors.white),
             ),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Logout'),
+              ),
+            ],
           ),
         ],
       ),

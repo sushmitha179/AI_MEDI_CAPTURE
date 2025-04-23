@@ -23,48 +23,46 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'AI Text Digitizer',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const AuthWrapper(), // Handle login or home from here
+      routes: {
+        '/splash': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/scan': (context) => const ScanScreen(),
+        '/results': (context) => const ResultScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
+      },
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance
-          .authStateChanges(), // Listen to auth state changes
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (snapshot.hasData) {
-          // User is logged in
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'AI Text Digitizer',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-            ),
-            initialRoute: '/home', // Go to home screen for logged-in users
-            routes: {
-              '/home': (context) => const HomeScreen(),
-              '/scan': (context) => const ScanScreen(),
-              '/results': (context) => const ResultScreen(),
-              '/settings': (context) => const SettingsScreen(),
-              '/notifications': (context) => const NotificationsScreen(),
-            },
-          );
+          return const HomeScreen(); // user is logged in
         } else {
-          // User is not logged in
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'AI Text Digitizer',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-            ),
-            initialRoute: '/splash', // Show splash screen first
-            routes: {
-              '/splash': (context) => const SplashScreen(),
-              '/login': (context) => const LoginScreen(),
-              '/signup': (context) => const SignUpScreen(),
-            },
-          );
+          return const SplashScreen(); // will lead to login
         }
       },
     );

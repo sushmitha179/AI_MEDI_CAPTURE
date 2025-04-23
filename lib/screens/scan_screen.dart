@@ -30,7 +30,7 @@ class _ScanScreenState extends State<ScanScreen> {
       _cameras = await availableCameras();
       _cameraController = CameraController(
         _cameras[0],
-        ResolutionPreset.medium,
+        ResolutionPreset.max,
         enableAudio: false,
       );
       await _cameraController.initialize();

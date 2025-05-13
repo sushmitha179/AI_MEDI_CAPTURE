@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+
+// Screens
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -14,7 +16,6 @@ import 'screens/settings_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   runApp(const MyApp());
 }
 
@@ -30,16 +31,28 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthWrapper(), // Handle login or home from here
+      // AuthWrapper handles login state
+      home: const AuthWrapper(),
+      // Define named routes
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
         '/scan': (context) => const ScanScreen(),
-        '/results': (context) => const ResultScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/notifications': (context) => const NotificationsScreen(),
+      },
+      // Handle route with arguments (Result Screen)
+      onGenerateRoute: (settings) {
+        if (settings.name == '/results') {
+          final recognizedText =
+              settings.arguments as String? ?? 'No text found.';
+          return MaterialPageRoute(
+            builder: (context) => ResultScreen(recognizedText: recognizedText),
+          );
+        }
+        return null;
       },
     );
   }
@@ -58,11 +71,10 @@ class AuthWrapper extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-
         if (snapshot.hasData) {
-          return const HomeScreen(); // user is logged in
+          return const HomeScreen();
         } else {
-          return const SplashScreen(); // will lead to login
+          return const SplashScreen();
         }
       },
     );

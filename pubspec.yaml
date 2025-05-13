@@ -1,33 +1,38 @@
-name: demo_project
-description: "A new Flutter project."
+name: demo_project  # Project name
+description: "A new Flutter project."  # Short description
 
-publish_to: 'none'
+publish_to: 'none'  # Prevent publishing to pub.dev
 
-version: 1.0.0+1
+version: 1.0.0+1  # App version: major.minor.patch+build
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"  # Supported Dart SDK range
 
 dependencies:
   flutter:
-    sdk: flutter
-  intl: ^0.18.1
-  cupertino_icons: ^1.0.8
-  firebase_core: ^3.12.1
-  firebase_auth: ^5.5.1
-  cloud_firestore: ^5.6.6
-  camera: ^0.10.0+4
-  image_picker: ^0.8.5+3
-  path_provider: ^2.1.2  # ✅ Correct usage
-  google_mlkit_barcode_scanning: 0.10.0  
-  google_mlkit_text_recognition: ^0.11.0
+    sdk: flutter  # Core Flutter SDK
+  intl: ^0.18.1  # For date/time formatting and localization
+  cupertino_icons: ^1.0.8  # iOS-style icons
+  firebase_core: ^3.12.1  # Firebase initialization
+  firebase_auth: ^5.5.1  # Firebase authentication
+  cloud_firestore: ^5.6.6  # Cloud Firestore database
+  camera: ^0.10.0+4  # Camera support for photo capture
+  image_picker: ^0.8.5+3  # Picking images from gallery or camera
+  path_provider: ^2.1.2  # Accessing system directories
+  google_mlkit_barcode_scanning: 0.10.0  # (Optional) barcode scanning
+  google_mlkit_text_recognition: ^0.11.0  # ML Kit OCR for text recognition
+  lottie: ^2.6.0
+  share_plus: ^7.2.1
+  flutter_tts: ^3.8.2
+
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
+    sdk: flutter  # Flutter's unit testing framework
+  flutter_lints: ^5.0.0  # Code style and quality rules
 
 flutter:
-  uses-material-design: true
+  uses-material-design: true  # Enable Material icons
   assets:
-    - assets/logo.png
+    - assets/logo.png  # Include logo image for app
+    - assets/animations/loader.json

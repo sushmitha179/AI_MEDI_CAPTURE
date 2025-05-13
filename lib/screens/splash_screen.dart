@@ -17,25 +17,40 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateBasedOnAuth() async {
-    await Future.delayed(const Duration(seconds: 2)); // Wait a bit
+    await Future.delayed(const Duration(seconds: 2)); // Optional splash delay
 
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      // User is logged in
-      Navigator.pushReplacementNamed(context, '/home'); // Or '/dashboard'
+    if (user != null && user.emailVerified) {
+      Navigator.pushReplacementNamed(context, '/home'); // Verified user
     } else {
-      // User not logged in
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(
+          context, '/login'); // Not logged in or not verified
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF4E2A6E), // Your app's theme color
       body: Center(
-        child: Image.asset('assets/logo.png', width: 200),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/logo.png', width: 120),
+            const SizedBox(height: 20),
+            const Text(
+              'AI Text Digitizer',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(color: Colors.white),
+          ],
+        ),
       ),
     );
   }

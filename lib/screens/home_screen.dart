@@ -14,7 +14,8 @@ class HomeScreen extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Hi there 👋', style: TextStyle(fontSize: 18)),
+            const Text('Welcome to AI Text Digitizer 🤖',
+                style: TextStyle(fontSize: 18)),
             if (user != null)
               Text(
                 user.email ?? '',
@@ -23,32 +24,23 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (String value) async {
-              if (value == 'logout') {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, '/login');
-              }
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacementNamed(context, '/login');
             },
-            icon: const CircleAvatar(
-              backgroundColor: Colors.deepPurple,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Text('Logout'),
-              ),
-            ],
           ),
         ],
+        elevation: 4,
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF4e2a6e), Colors.white],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Padding(
@@ -57,22 +49,50 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.deepPurple,
-                      child: Icon(Icons.home, color: Colors.white),
+                  color: Colors.white.withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Welcome to your Dashboard! ✨',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.deepPurple,
+                          child: Icon(Icons.auto_awesome, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Digitize your handwritten notes effortlessly!',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: EdgeInsets.only(left: 48),
+                      child: Text(
+                        'Scan, convert, and store with AI power.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -110,7 +130,7 @@ class HomeScreen extends StatelessWidget {
   IconData _getIconForCard(int index) {
     switch (index) {
       case 0:
-        return Icons.document_scanner;
+        return Icons.auto_awesome; // AI-themed icon
       case 1:
         return Icons.history;
       case 2:
@@ -118,7 +138,7 @@ class HomeScreen extends StatelessWidget {
       case 3:
         return Icons.settings;
       default:
-        return Icons.help;
+        return Icons.help_outline;
     }
   }
 
@@ -176,38 +196,35 @@ class HomeCard extends StatelessWidget {
       child: Card(
         elevation: 6,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
         child: InkWell(
           onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(12),
+          borderRadius: BorderRadius.circular(16.0),
+          child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: Offset(2, 2),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(16.0),
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.deepPurple.shade50],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: const Color(0xFF4e2a6e).withOpacity(0.1),
                   ),
                   child: Icon(icon, size: 40, color: const Color(0xFF4e2a6e)),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Text(
                   label,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -19,7 +19,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  // 🔹 Function to Handle Sign-Up with Email Verification
   Future<void> _signUpUser() async {
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -31,9 +30,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Passwords do not match!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match!")),
+      );
       return;
     }
 
@@ -42,28 +41,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
 
     try {
-      // 🔹 Create user in Firebase Authentication
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          );
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
       User? user = userCredential.user;
 
       if (user != null) {
-        // 🔹 Send Email Verification
         await user.sendEmailVerification();
         print("📩 Verification email sent!");
 
-        // 🔹 Store User Profile in Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'full_name': _nameController.text.trim(),
           'email': _emailController.text.trim(),
           'created_at': DateTime.now(),
         });
 
-        // Show a message and redirect user to login
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -82,15 +77,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
       } else {
-        print("❌ Sign-up failed: $e");
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Sign-up failed: ${e.message}")));
+        print("❌ Sign-up failed: \$e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Sign-up failed: \${e.message}")),
+        );
       }
     } catch (e) {
-      print("❌ Sign-up failed: $e");
+      print("❌ Sign-up failed: \$e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Sign-up failed: ${e.toString()}")),
+        SnackBar(content: Text("Sign-up failed: \${e.toString()}")),
       );
     }
 
@@ -104,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF4E2A6E),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -208,18 +203,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       onPressed: _isLoading ? null : _signUpUser,
-                      child:
-                          _isLoading
-                              ? const CircularProgressIndicator(
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                fontSize: 18,
                                 color: Colors.white,
-                              )
-                              : const Text(
-                                "Sign Up",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
                               ),
+                            ),
                     ),
                     const SizedBox(height: 10),
                     TextButton(

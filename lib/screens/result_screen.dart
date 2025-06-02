@@ -21,10 +21,16 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.recognizedText != null &&
           widget.recognizedText!.trim().isNotEmpty) {
-        _showFullTextDialog(context, widget.recognizedText!, 'N/A', 'Just Now');
+        _showFullTextDialog(
+          context,
+          widget.recognizedText!,
+          'N/A',
+          _formatTimestamp(DateTime.now()),
+        );
       }
     });
 
@@ -64,6 +70,12 @@ class _ResultScreenState extends State<ResultScreen> {
               decoration: InputDecoration(
                 hintText: '🔍 Search scanned text...',
                 prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => _searchController.clear(),
+                      )
+                    : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -98,15 +110,14 @@ class _ResultScreenState extends State<ResultScreen> {
                 }
 
                 return ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   itemCount: filteredScans.length,
                   itemBuilder: (context, index) {
                     final scan = filteredScans[index];
                     final text = scan['text'] ?? '';
                     final timestamp =
                         (scan['timestamp'] as Timestamp?)?.toDate();
-                    final formattedDate = timestamp != null
-                        ? DateFormat('dd MMM yyyy, hh:mm a').format(timestamp)
-                        : 'Unknown';
+                    final formattedDate = _formatTimestamp(timestamp);
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(
@@ -150,35 +161,55 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
+  String _formatTimestamp(DateTime? dateTime) {
+    if (dateTime == null) return 'Unknown';
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final scanDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    if (scanDate == today) {
+      return 'Today at ${DateFormat('hh:mm a').format(dateTime)}';
+    } else if (scanDate == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday at ${DateFormat('hh:mm a').format(dateTime)}';
+    } else {
+      return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+    }
+  }
+
   void _showFullTextDialog(
       BuildContext context, String text, String scanId, String? timestamp) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('📄 Recognized Text'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Text:\n$text"),
+              Text("📝 Text:\n$text"),
+              const SizedBox(height: 12),
+              Text("🕒 Timestamp: $timestamp"),
               const SizedBox(height: 8),
-              Text("Timestamp: $timestamp"),
-              const SizedBox(height: 8),
-              Text("Scan ID: $scanId"),
+              Text("🆔 Scan ID: $scanId"),
             ],
           ),
         ),
+        actionsPadding: const EdgeInsets.only(right: 12, bottom: 8),
         actions: [
           IconButton(
+            tooltip: 'Copy',
             icon: const Icon(Icons.copy),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));
+              Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Copied to clipboard')),
               );
             },
           ),
           IconButton(
+            tooltip: 'Share',
             icon: const Icon(Icons.share),
             onPressed: () => Share.share(text),
           ),
@@ -195,6 +226,7 @@ class _ResultScreenState extends State<ResultScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text("🗑️ Delete Scan"),
         content: const Text("Are you sure you want to delete this scan?"),
         actions: [
@@ -218,10 +250,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 );
               }
             },
-            child: const Text(
-              "Delete",
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

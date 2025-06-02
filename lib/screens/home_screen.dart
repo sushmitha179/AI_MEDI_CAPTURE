@@ -7,19 +7,27 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4e2a6e),
+        backgroundColor: colorScheme.primary,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Welcome to AI Text Digitizer 🤖',
-                style: TextStyle(fontSize: 18)),
+            const Text(
+              'Welcome to AI Text Digitizer 🤖',
+              style: TextStyle(fontSize: 18),
+            ),
             if (user != null)
               Text(
                 user.email ?? '',
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onPrimary.withOpacity(0.7),
+                ),
               ),
           ],
         ),
@@ -36,9 +44,12 @@ class HomeScreen extends StatelessWidget {
         elevation: 4,
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4e2a6e), Colors.white],
+            colors: [
+              colorScheme.primary,
+              theme.scaffoldBackgroundColor,
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -46,80 +57,10 @@ class HomeScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.85),
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.deepPurple,
-                          child: Icon(Icons.auto_awesome, color: Colors.white),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Digitize your handwritten notes effortlessly!',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Padding(
-                      padding: EdgeInsets.only(left: 48),
-                      child: Text(
-                        'Scan, convert, and store with AI power.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _buildHeaderCard(context),
               const SizedBox(height: 20),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
-                    return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
-                      itemCount: 4,
-                      itemBuilder: (context, index) {
-                        return HomeCard(
-                          icon: _getIconForCard(index),
-                          label: _getLabelForCard(index),
-                          onTap: () => _navigateToScreen(index, context),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+              Expanded(child: _buildGrid(context)),
             ],
           ),
         ),
@@ -127,14 +68,91 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildHeaderCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surface.withOpacity(isDark ? 0.8 : 0.95),
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : theme.shadowColor.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            backgroundColor: colorScheme.primary,
+            child: Icon(Icons.auto_awesome, color: colorScheme.onPrimary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Digitize your handwritten notes effortlessly!',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Scan, convert, and store with AI power.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGrid(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            return HomeCard(
+              icon: _getIconForCard(index),
+              label: _getLabelForCard(index),
+              onTap: () => _navigateToScreen(index, context),
+            );
+          },
+        );
+      },
+    );
+  }
+
   IconData _getIconForCard(int index) {
     switch (index) {
       case 0:
-        return Icons.auto_awesome; // AI-themed icon
+        return Icons.document_scanner_outlined;
       case 1:
         return Icons.history;
       case 2:
-        return Icons.notifications;
+        return Icons.notifications_active;
       case 3:
         return Icons.settings;
       default:
@@ -171,8 +189,6 @@ class HomeScreen extends StatelessWidget {
       case 3:
         Navigator.pushNamed(context, '/settings');
         break;
-      default:
-        break;
     }
   }
 }
@@ -180,7 +196,7 @@ class HomeScreen extends StatelessWidget {
 class HomeCard extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Function() onTap;
+  final VoidCallback onTap;
 
   const HomeCard({
     super.key,
@@ -191,48 +207,53 @@ class HomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16.0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.deepPurple.shade50],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF4e2a6e).withOpacity(0.1),
-                  ),
-                  child: Icon(icon, size: 40, color: const Color(0xFF4e2a6e)),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF4e2a6e),
-                  ),
-                ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                colorScheme.surface,
+                isDark
+                    ? colorScheme.surfaceVariant.withOpacity(0.2)
+                    : colorScheme.secondaryContainer.withOpacity(0.3),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark
+                      ? colorScheme.primary.withOpacity(0.2)
+                      : colorScheme.primary.withOpacity(0.1),
+                ),
+                child: Icon(icon, size: 40, color: colorScheme.primary),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
           ),
         ),
       ),

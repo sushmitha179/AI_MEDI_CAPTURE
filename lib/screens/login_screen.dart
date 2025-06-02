@@ -33,16 +33,12 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter both email and password.")),
-      );
+      _showSnackbar("Please enter both email and password.");
       return;
     }
 
     if (!_isValidEmail(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid email format.")),
-      );
+      _showSnackbar("Invalid email format.");
       return;
     }
 
@@ -57,21 +53,15 @@ class _LoginScreenState extends State<LoginScreen> {
       User? user = userCredential.user;
 
       if (user != null && user.emailVerified) {
-        print("✅ Login successful!");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("⚠️ Please verify your email before logging in."),
-          ),
-        );
+        _showSnackbar("⚠️ Please verify your email before logging in.");
       }
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Login failed. Please try again.";
-
       if (e.code == 'user-not-found') {
         errorMessage = "No account found with this email.";
       } else if (e.code == 'wrong-password') {
@@ -83,14 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (e.code == 'too-many-requests') {
         errorMessage = "Too many failed attempts. Try again later.";
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      _showSnackbar(errorMessage);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred: ${e.toString()}")),
-      );
+      _showSnackbar("An error occurred: ${e.toString()}");
     }
 
     setState(() {
@@ -98,10 +83,19 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF4E2A6E),
+      backgroundColor: colorScheme.background,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -109,23 +103,23 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   "Welcome Back!",
-                  style: TextStyle(
-                    fontSize: 28,
+                  style: textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.black45
+                            : Colors.black26,
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
@@ -136,16 +130,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
+                        style: textTheme.bodyLarge,
+                        decoration: InputDecoration(
                           labelText: "Email",
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.email),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.email),
                         ),
                       ),
                       const SizedBox(height: 15),
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
+                        style: textTheme.bodyLarge,
                         decoration: InputDecoration(
                           labelText: "Password",
                           border: const OutlineInputBorder(),
@@ -167,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6A4BA3),
+                          backgroundColor: colorScheme.primary,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 50, vertical: 15),
                           shape: RoundedRectangleBorder(
@@ -192,9 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
-                        child: const Text(
+                        child: Text(
                           "Don't have an account? Sign Up",
-                          style: TextStyle(color: Colors.deepPurple),
+                          style: TextStyle(color: colorScheme.primary),
                         ),
                       ),
                     ],

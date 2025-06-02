@@ -81,17 +81,35 @@ class _ScanScreenState extends State<ScanScreen> {
       'text': text,
       'timestamp': FieldValue.serverTimestamp(),
     });
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('notifications')
+        .add({
+      'title': 'New Scan Saved',
+      'message': 'Your scan was recognized and saved successfully.',
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
-    _flutterTts.stop(); // Stop TTS if navigating away
+    _flutterTts.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color accentColor = const Color(0xFF4E2A6E);
+    final Color buttonBg = isDark ? Colors.white : Colors.white;
+    final Color buttonFg = accentColor;
+    final Color overlayBg =
+        isDark ? Colors.grey[900]! : const Color(0xFFF1EFFF);
+    final Color textColor = isDark ? Colors.white70 : Colors.black87;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: _isCameraInitialized
@@ -112,8 +130,8 @@ class _ScanScreenState extends State<ScanScreen> {
                       icon: const Icon(Icons.camera_alt_outlined),
                       label: const Text("Capture & Recognize"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.deepPurple,
+                        backgroundColor: buttonBg,
+                        foregroundColor: buttonFg,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 26, vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -147,13 +165,13 @@ class _ScanScreenState extends State<ScanScreen> {
                   DraggableScrollableSheet(
                     initialChildSize: 0.3,
                     minChildSize: 0.2,
-                    maxChildSize: 0.6,
+                    maxChildSize: 0.65,
                     builder: (context, controller) => Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                        boxShadow: [
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 12,
@@ -165,29 +183,29 @@ class _ScanScreenState extends State<ScanScreen> {
                       child: ListView(
                         controller: controller,
                         children: [
-                          const Text(
+                          Text(
                             '🤖 AI Recognized Text',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.deepPurple,
+                              color: accentColor,
                             ),
                           ),
                           const SizedBox(height: 12),
                           Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1EFFF),
+                              color: overlayBg,
                               borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: Colors.deepPurple.shade100),
+                              border: Border.all(
+                                  color: accentColor.withOpacity(0.3)),
                             ),
                             child: Text(
                               _recognizedText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 height: 1.4,
-                                color: Colors.black87,
+                                color: textColor,
                               ),
                             ),
                           ),

@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'theme/theme_provider.dart';
 
-// Screens
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -66,7 +65,7 @@ class MyApp extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
       ),
-      darkTheme: ThemeData.dark(), // Add your custom dark theme if needed
+      darkTheme: ThemeData.dark(),
       home: const AuthWrapper(),
       routes: {
         '/login': (context) => const LoginScreen(),
